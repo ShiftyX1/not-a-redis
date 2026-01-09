@@ -1,0 +1,14 @@
+CMakeCache.txt
+CMakeFiles/
+Makefile
+cmake_install.cmake
+install_local_manifest.txt
+install_manifest.txt
+install_prefix.txt
+install_strip.txt
+install_strip_local.txt
+install_strip_local_manifest.txt
+install_strip_local_manifest.txt
+.vscode/
+
+my_own_redis
