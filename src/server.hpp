@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <stdint.h>
 #include "config.hpp"
 
 class Server {
@@ -15,6 +16,6 @@ private:
     std::string address;
     int port;
 
-    void handle_connection(int connectionfd);
+    int32_t handle_connection(int connectionfd);
     void setup();
 };

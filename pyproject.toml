@@ -1,0 +1,10 @@
+[project]
+name = "own-redis-client"
+version = "0.1.0"
+description = "Fuck C++ for client I swear bruh"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = []
+
+[project.scripts]
+client = "python client.py"
