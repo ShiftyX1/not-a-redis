@@ -1,7 +1,25 @@
 #include "net_util.hpp"
 #include <assert.h>
 #include <string>
+#include <fcntl.h>
+#include <errno.h>
 
+
+void fd_set_nb(int fd) {
+    errno = 0;
+    int flags = fcntl(fd, F_GETFL, 0);
+    if (errno) {
+         // handle error
+         return;
+    }
+    flags |= O_NONBLOCK;
+
+    errno = 0;
+    (void)fcntl(fd, F_SETFL, flags);
+    if (errno) {
+        // handle error
+    }
+}
 
 int32_t read_full(int connectionfd, void* buf, size_t len) {
     auto buffer = static_cast<char*>(buf);
