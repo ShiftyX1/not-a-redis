@@ -14,3 +14,6 @@ install_strip_local_manifest.txt
 
 .venv/
 my_own_redis
+
+
+*.log

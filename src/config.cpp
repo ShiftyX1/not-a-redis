@@ -18,6 +18,8 @@ void Config::load_from_file(const std::string& filename) {
         std::cout << "Using default parameters: 127.0.0.1:6379\n";
         address = "127.0.0.1";
         port = 6379;
+        log_level = "INFO";
+        log_file = "";
         return;
     }
 
@@ -27,11 +29,18 @@ void Config::load_from_file(const std::string& filename) {
             file >> address;
         } else if (key == "port") {
             file >> port;
+        } else if (key == "log_level") {
+            file >> log_level;
+        } else if (key == "log_file") {
+            file >> log_file;
         } else {
             std::cerr << "Unknown key: " << key << "\n";
             continue;
         }
     }
+
+    // Set defaults if not provided
+    if (log_level.empty()) log_level = "INFO";
 
     file.close();
 }
@@ -42,6 +51,14 @@ std::string Config::get_address() const {
 
 int Config::get_port() const {
     return port;
+}
+
+std::string Config::get_log_level() const {
+    return log_level;
+}
+
+std::string Config::get_log_file() const {
+    return log_file;
 }
 
 void Config::check_required_keys() const {

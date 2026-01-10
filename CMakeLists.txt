@@ -12,6 +12,7 @@ set(SOURCES
     src/config.cpp
     src/server.cpp
     src/net_util.cpp
+    src/logger.cpp
 )
 
 add_executable(my_own_redis ${SOURCES})
