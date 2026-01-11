@@ -5,6 +5,9 @@ This is a learning project for me to understand how Redis works internally. It i
 
 Thanks to [Build-your-own-X](https://github.com/codecrafters-io/build-your-own-x) repository for helping me get started with this project!
 
+> [!NOTE]
+> **Main Repository:** [git.pyserve.org/Shifty/own-redis](https://git.pyserve.org/Shifty/own-redis)  
+> *(GitHub is only a mirror)*
 
 # Building
 
