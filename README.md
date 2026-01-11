@@ -65,6 +65,7 @@ Currently supported commands:
 # Afterwords
 
 I don't plan to make this project more complex, but I might add some features in the future. And I don't know if you would find this project useful, but feel free to use it as a learning resource or a starting point for your own projects!
-Enjoy coding!
-Love yourself!
-Be happy! ☺️
+
+- Enjoy coding! 👨‍💻
+- Love yourself! ❤️
+- Be happy! ☺️
