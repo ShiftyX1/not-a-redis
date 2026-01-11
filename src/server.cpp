@@ -160,22 +160,96 @@ void Server::state_res(Connection* conn) {
     }
 }
 
+static int32_t parse_req(
+    const uint8_t* data, size_t len, std::vector<std::string>& out) 
+{
+    if (len < 4) {
+        return -1;
+    }
+    uint32_t n = 0;
+    memcpy(&n, data, 4);
+    n = ntohl(n);
+    size_t pos = 4;
+    while (n--) {
+        if (pos + 4 > len) {
+            return -1;
+        }
+        uint32_t sz = 0;
+        memcpy(&sz, data + pos, 4);
+        sz = ntohl(sz);
+        pos += 4;
+        if (pos + sz > len) {
+            return -1;
+        }
+        out.push_back(std::string((char*)&data[pos], sz));
+        pos += sz;
+    }
+    if (pos != len) {
+        return -1;
+    }
+    return 0;
+}
+
 int32_t Server::parse_and_execute(Connection* conn) {
     uint32_t len_net;
     memcpy(&len_net, conn->incoming.data(), 4);
     uint32_t len = ntohl(len_net);
     
-    std::string message(conn->incoming.begin() + 4, conn->incoming.begin() + 4 + len);
-    Logger::log_info("Client (fd=" + std::to_string(conn->connectionfd) + ") says: " + message);
+    std::vector<std::string> cmd;
+    if (parse_req(conn->incoming.data() + 4, len, cmd) != 0) {
+        Logger::log_error("bad request");
+        return -1;
+    }
+
+    uint32_t status = RES_OK;
+    std::string msg;
+
+    if (cmd.empty()) {
+        status = RES_ERR;
+        msg = "Empty command";
+    } else {
+        std::string name = cmd[0];
+        if (name == "set") {
+            if (cmd.size() == 3) {
+                g_data[cmd[1]] = cmd[2];
+            } else {
+                status = RES_ERR;
+                msg = "Usage: set key value";
+            }
+        } else if (name == "get") {
+            if (cmd.size() == 2) {
+                auto it = g_data.find(cmd[1]);
+                if (it == g_data.end()) {
+                    status = RES_NX;
+                } else {
+                    msg = it->second;
+                }
+            } else {
+                status = RES_ERR;
+                msg = "Usage: get key";    
+            }
+        } else if (name == "del") {
+            if (cmd.size() == 2) {
+                g_data.erase(cmd[1]);
+            } else {
+                status = RES_ERR;
+                msg = "Usage: del key";
+            }
+        } else {
+            status = RES_ERR;
+            msg = "Unknown command: " + name;
+        }
+    }
     
-    const std::string reply = "world";
-    uint32_t reply_len = static_cast<uint32_t>(reply.size());
-    uint32_t reply_len_net = htonl(reply_len);
+    uint32_t reply_len = (uint32_t)msg.size();
+    uint32_t total_len = 4 + reply_len;
     
-    const char* header_ptr = reinterpret_cast<const char*>(&reply_len_net);
-    conn->outgoing.insert(conn->outgoing.end(), header_ptr, header_ptr + 4);
+    uint32_t total_len_net = htonl(total_len);
+    uint32_t status_net = htonl(status);
     
-    conn->outgoing.insert(conn->outgoing.end(), reply.begin(), reply.end());
+    conn->outgoing.insert(conn->outgoing.end(), (char*)&total_len_net, (char*)&total_len_net + 4);
+    conn->outgoing.insert(conn->outgoing.end(), (char*)&status_net, (char*)&status_net + 4);
+    conn->outgoing.insert(conn->outgoing.end(), msg.begin(), msg.end());
     
     conn->state = STATE_RES;
     return 0;

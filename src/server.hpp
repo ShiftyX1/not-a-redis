@@ -35,6 +35,8 @@ private:
     std::vector<struct pollfd> poll_args;
     std::map<int, Connection*> fd2conn;
 
+    std::map<std::string, std::string> g_data;
+
     void setup();
     void accept_new_connection();
     void connection_io(Connection* conn);
